@@ -193,7 +193,11 @@ predictions <- ml_transform(
 ## get evaluation metric of the predictions
 ml_binary_classification_evaluator(predictions)
 
-
+## Spark puts predictions into a one list column, in R you
+## can't do anything with it, it needs to be separated
+INR = predictions %>%
+  sdf_separate_column("probability", c("P0", "P1")) %>% 
+  collect()
 
 ################## close the connection ##################################
 
