@@ -1,6 +1,7 @@
 library(sparklyr)
 library(dplyr)
 library(DBI)
+library(ggplot2)
 
 sc <- spark_connect(master = "local")
 
@@ -19,14 +20,58 @@ cars2 = readRDS("cars2.RDs")
 cars_tbl = copy_to(sc,cars)
 cars2_tbl = copy_to(sc,cars2)
 
-
-
-
 #### dplyr statements to manipulate spark data #############################
 
 
+cars_tbl %>% count()
+
+## lazy evaluation...
+cars_tbl2 = cars_tbl %>% 
+  mutate(
+    newcol1 = 100*vs,
+    newcol2 = wt + cyl
+  )
+
+## split up longer manipulation 
+cars_tbl3 = cars_tbl2 %>% 
+  group_by(
+    cyl
+  ) %>% 
+  summarise(
+    meancol = mean(newcol2)
+  )
+
+## collect to R:  BE CARE FULL:  DO NOT FLOOD YOUR R SESSION!!!
+cars3 = cars_tbl3 %>% collect()
+
+## now you can do ggplots or whatever you want in R.....
+ggplot(cars3, aes(cyl)) + geom_bar(aes(weight = meancol))
+
+
+cars3_tbl = cars_tbl %>% 
+  left_join(
+    cars2_tbl,
+    by = c("car" = "car")
+  ) %>% 
+  filter(
+    TEST > 0.1
+  )
 
 ####  machine learning #####################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+################## close the connection ##################################
 
 
 spark_disconnect(sc)
