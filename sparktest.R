@@ -117,9 +117,10 @@ pred = sdf_predict(
 )
 
 
-####### ml_pipelines ##############################
+####### Machine learning  pipelines ##############################
 
-## in R you can use functional sequences
+#### R piplines ####
+## in R you can use functional sequences that can be used as pipelines...
 r_pipeline =  . %>% 
   mutate(
     cyl = paste0("c", cyl)
@@ -134,7 +135,7 @@ cars %>%
   r_pipeline() %>% 
   summary()
 
-
+#### SPARK ML PIPELIENS ####
 ## Now you can use Spark MLlib ML pipelines on Spark data within RStudio
 spark_flights = sdf_copy_to(sc, flights)
 
@@ -145,7 +146,6 @@ flight_dplyr_stmts = spark_flights %>%
     day = paste0("d", day)
   ) %>%
   select(dep_delay, sched_dep_time, month, day, distance) 
-
 
 
 flights_pipeline <- ml_pipeline(sc) %>%
@@ -162,7 +162,9 @@ flights_pipeline <- ml_pipeline(sc) %>%
     output.col = "hours",
     splits = c(400, 800, 1200, 1600, 2000, 2400)
   )  %>%
-  ft_r_formula(delayed ~ month + day + hours + distance) %>% 
+  ft_r_formula(
+    delayed ~ month + day + hours + distance
+  ) %>% 
   ml_logistic_regression()
 
 
@@ -192,6 +194,7 @@ predictions <- ml_transform(
 
 ## get evaluation metric of the predictions
 ml_binary_classification_evaluator(predictions)
+
 
 ## Spark puts predictions into a one list column, in R you
 ## can't do anything with it, it needs to be separated
