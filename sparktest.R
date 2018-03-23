@@ -145,10 +145,12 @@ flight_dplyr_stmts = spark_flights %>%
     month = paste0("m", month),
     day = paste0("d", day)
   ) %>%
-  select(dep_delay, sched_dep_time, month, day, distance) 
+  select(
+    dep_delay, sched_dep_time, month, day, distance
+  ) 
 
 
-flights_pipeline <- ml_pipeline(sc) %>%
+flights_pipeline = ml_pipeline(sc) %>%
   ft_dplyr_transformer(
     tbl = flight_dplyr_stmts
   ) %>%
@@ -171,14 +173,14 @@ flights_pipeline <- ml_pipeline(sc) %>%
 
 ### use train data to fit the ml pipeline
 
-partitioned_flights <- sdf_partition(
+partitioned_flights = sdf_partition(
   spark_flights,
   training = 0.01,
   testing = 0.01,
   rest = 0.98
 )
 
-fitted_pipeline <- ml_fit(
+fitted_pipeline = ml_fit(
   flights_pipeline,
   partitioned_flights$training
 )
@@ -186,9 +188,28 @@ fitted_pipeline <- ml_fit(
 ## now contains fitted coefficients
 fitted_pipeline
 
-### use fitted pipeline to apply on test set
-predictions <- ml_transform(
+
+#### saving spark ml pipeline en fitted pipeline ####
+
+ml_save(
+  flights_pipeline,
+  "flights_pipeline",
+  overwrite = TRUE
+)
+
+ml_save(
   fitted_pipeline,
+  "flights_model",
+  overwrite = TRUE
+)
+
+
+### use fitted pipeline to apply on test set
+
+reloaded_model <- ml_load(sc, "flights_model")
+
+predictions <- ml_transform(
+  reloaded_model,
   partitioned_flights$testing
 )
 
@@ -198,8 +219,12 @@ ml_binary_classification_evaluator(predictions)
 
 ## Spark puts predictions into a one list column, in R you
 ## can't do anything with it, it needs to be separated
+
 INR = predictions %>%
-  sdf_separate_column("probability", c("P0", "P1")) %>% 
+  sdf_separate_column(
+    "probability",
+    c("P0", "P1")
+  ) %>% 
   collect()
 
 ################## close the connection ##################################
