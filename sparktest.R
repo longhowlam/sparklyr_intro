@@ -4,7 +4,7 @@ library(DBI)
 library(ggplot2)
 library(nycflights13)
 
-#spark_install(version = "2.2.0")
+spark_install(version = "2.2.0")
 
 sc <- spark_connect(master = "local", version = "2.2.0")
 
