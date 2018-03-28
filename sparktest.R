@@ -4,7 +4,7 @@ library(DBI)
 library(ggplot2)
 library(nycflights13)
 
-spark_install(version = "2.2.0")
+#spark_install(version = "2.2.0")
 
 sc <- spark_connect(master = "local", version = "2.2.0")
 
@@ -24,7 +24,6 @@ cars_tbl = copy_to(sc,cars)
 cars2_tbl = copy_to(sc,cars2)
 
 #### dplyr statements to manipulate spark data #############################
-
 
 cars_tbl %>% count()
 
@@ -81,9 +80,7 @@ SpeciesCounter %>%
   ml_transform(test_tbl)
 
 
-
-
-############################################################################
+#***************************************************************************
 ####  machine learning #####################################################
 
 mpg_lmmodel = cars_tbl %>% 
