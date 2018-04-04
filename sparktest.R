@@ -86,7 +86,7 @@ SpeciesCounter %>%
 mpg_lmmodel = cars_tbl %>% 
   ml_linear_regression( mpg ~ disp + cyl + hp)
 
-summary(mpg_model)
+summary(mpg_lmmodel)
 
 mpg_lmmodel = cars_tbl %>% 
   ml_linear_regression( mpg ~ . - car)
