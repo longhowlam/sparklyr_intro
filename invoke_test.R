@@ -26,6 +26,9 @@ trx_agg %>% count()
 ## it ourselves with the following helper function. It defines and fits the 
 ## algorithm given the data and minimum support and confidence
 
+## see scala doc
+## https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.fpm.FPGrowth
+
 ml_fpgrowth = function(
   x, 
   features_col = "items",
