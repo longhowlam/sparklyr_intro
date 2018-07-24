@@ -23,7 +23,8 @@ cars2 = readRDS("cars2.RDs")
 cars_tbl = copy_to(sc,cars)
 cars2_tbl = copy_to(sc,cars2)
 
-#### dplyr statements to manipulate spark data #############################
+#### dplyr statements #########################################################
+## to manipulate spark data 
 
 cars_tbl %>% count()
 
@@ -60,7 +61,7 @@ cars3_tbl = cars_tbl %>%
   )
 
 
-#######  dplyr transformers #############################
+#######  dplyr transformers ###################################################
 
 iris_tbl = copy_to(sc, iris, overwrite = T)
 
