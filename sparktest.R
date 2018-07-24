@@ -84,6 +84,7 @@ SpeciesCounter %>%
 #***************************************************************************
 ####  machine learning #####################################################
 
+### vergelijkbare formula syntax als in R
 mpg_lmmodel = cars_tbl %>% 
   ml_linear_regression( mpg ~ disp + cyl + hp)
 
