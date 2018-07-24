@@ -114,7 +114,7 @@ fit = partitions$training %>%
 
 # predict mpg on  on test set
 pred = sdf_predict(
-  fit, partitions$test
+  partitions$test,  fit
 )
 
 
