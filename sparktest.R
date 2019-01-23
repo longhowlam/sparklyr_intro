@@ -5,8 +5,9 @@ library(ggplot2)
 library(nycflights13)
 
 #spark_install(version = "2.2.0")
+#spark_install(version = "2.4.0")
 
-sc <- spark_connect(master = "local", version = "2.2.0")
+sc <- spark_connect(master = "local", version = "2.4.0")
 
 cars = readRDS("cars.RDs")
 cars2 = readRDS("cars2.RDs")
@@ -14,6 +15,7 @@ cars2 = readRDS("cars2.RDs")
 
 ### once connected you have in RStudio the connections GUI to see spark tables
 ## and a link to the SPARK UI
+
 
 
 ### normally you would not put big data sets from R to Spark....
@@ -34,6 +36,8 @@ cars_tbl2 = cars_tbl %>%
     newcol1 = 100*vs,
     newcol2 = wt + cyl
   )
+
+cars_tbl2 %>%  count()
 
 ## split up longer manipulation 
 cars_tbl3 = cars_tbl2 %>% 
@@ -227,6 +231,11 @@ INR = predictions %>%
     c("P0", "P1")
   ) %>% 
   collect()
+
+
+#### long runnning spark jobs are now visible in jobs monitor in RStudio
+sdf_len(sc, 10) %>% spark_apply(~ Sys.sleep(60 * 10))
+
 
 ################## close the connection ##################################
 
