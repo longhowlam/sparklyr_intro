@@ -4,9 +4,9 @@ library(DBI)
 library(ggplot2)
 library(nycflights13)
 
-#spark_install(version = "2.2.0")
+#spark_install(version = "2.4.0")
 
-sc <- spark_connect(master = "local", version = "2.2.0")
+sc <- spark_connect(master = "local", version = "2.4.0")
 
 cars = readRDS("cars.RDs")
 cars2 = readRDS("cars2.RDs")
@@ -154,13 +154,13 @@ flights_pipeline = ml_pipeline(sc) %>%
     tbl = flight_dplyr_stmts
   ) %>%
   ft_binarizer(
-    input.col = "dep_delay",
-    output.col = "delayed",
+    input_col = "dep_delay",
+    output_col = "delayed",
     threshold = 15
   ) %>%
   ft_bucketizer(
-    input.col = "sched_dep_time",
-    output.col = "hours",
+    input_col = "sched_dep_time",
+    output_col = "hours",
     splits = c(400, 800, 1200, 1600, 2000, 2400)
   )  %>%
   ft_r_formula(
@@ -174,9 +174,9 @@ flights_pipeline = ml_pipeline(sc) %>%
 
 partitioned_flights = sdf_partition(
   spark_flights,
-  training = 0.01,
-  testing = 0.01,
-  rest = 0.98
+  training = 0.6,
+  testing = 0.3,
+  rest = 0.1
 )
 
 fitted_pipeline = ml_fit(
@@ -188,6 +188,11 @@ fitted_pipeline = ml_fit(
 fitted_pipeline
 
 
+## pipeline consists of multiple things
+#fifth stage is the logistic regression from which we can extract parameters
+fitted_pipeline$stages[[5]]
+fitted_pipeline$stages[[5]]$coefficients
+
 #### saving spark ml pipeline en fitted pipeline ####
 
 ml_save(
@@ -196,11 +201,6 @@ ml_save(
   overwrite = TRUE
 )
 
-ml_save(
-  fitted_pipeline,
-  "flights_model",
-  overwrite = TRUE
-)
 
 
 ### use fitted pipeline to apply on test set
