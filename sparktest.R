@@ -16,6 +16,7 @@ cars2 = readRDS("cars2.RDs")
 ## and a link to the SPARK UI
 
 
+
 ### normally you would not put big data sets from R to Spark....
 ### they would come from HIVE for example or parquet, something
 ### that is scalable to import in paralel into spark mememory
@@ -23,7 +24,8 @@ cars2 = readRDS("cars2.RDs")
 cars_tbl = copy_to(sc,cars)
 cars2_tbl = copy_to(sc,cars2)
 
-#### dplyr statements to manipulate spark data #############################
+#### dplyr statements #########################################################
+## to manipulate spark data 
 
 cars_tbl %>% count()
 
@@ -33,6 +35,8 @@ cars_tbl2 = cars_tbl %>%
     newcol1 = 100*vs,
     newcol2 = wt + cyl
   )
+
+cars_tbl2 %>%  count()
 
 ## split up longer manipulation 
 cars_tbl3 = cars_tbl2 %>% 
@@ -60,7 +64,7 @@ cars3_tbl = cars_tbl %>%
   )
 
 
-#######  dplyr transformers #############################
+#######  dplyr transformers ###################################################
 
 iris_tbl = copy_to(sc, iris, overwrite = T)
 
@@ -83,6 +87,7 @@ SpeciesCounter %>%
 #***************************************************************************
 ####  machine learning #####################################################
 
+### vergelijkbare formula syntax als in R
 mpg_lmmodel = cars_tbl %>% 
   ml_linear_regression( mpg ~ disp + cyl + hp)
 
@@ -112,7 +117,7 @@ fit = partitions$training %>%
 
 # predict mpg on  on test set
 pred = sdf_predict(
-  fit, partitions$test
+  partitions$test,  fit
 )
 
 
@@ -225,6 +230,11 @@ INR = predictions %>%
     c("P0", "P1")
   ) %>% 
   collect()
+
+
+#### long runnning spark jobs are now visible in jobs monitor in RStudio
+sdf_len(sc, 10) %>% spark_apply(~ Sys.sleep(60 * 10))
+
 
 ################## close the connection ##################################
 
