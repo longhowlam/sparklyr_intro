@@ -179,9 +179,8 @@ flights_pipeline = ml_pipeline(sc) %>%
 
 partitioned_flights = sdf_partition(
   spark_flights,
-  training = 0.6,
-  testing = 0.3,
-  rest = 0.1
+  training = 0.8,
+  testing = 0.2
 )
 
 fitted_pipeline = ml_fit(
