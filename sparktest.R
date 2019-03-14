@@ -4,7 +4,6 @@ library(DBI)
 library(ggplot2)
 library(nycflights13)
 
-#spark_install(version = "2.2.0")
 #spark_install(version = "2.4.0")
 
 sc <- spark_connect(master = "local", version = "2.4.0")
@@ -187,9 +186,8 @@ class(flights_pipeline)
 
 partitioned_flights = sdf_partition(
   spark_flights,
-  training = 0.01,
-  testing = 0.01,
-  rest = 0.98
+  training = 0.8,
+  testing = 0.2
 )
 
 fitted_pipeline = ml_fit(
@@ -201,6 +199,11 @@ fitted_pipeline = ml_fit(
 fitted_pipeline
 
 
+## pipeline consists of multiple things
+#fifth stage is the logistic regression from which we can extract parameters
+fitted_pipeline$stages[[5]]
+fitted_pipeline$stages[[5]]$coefficients
+
 #### saving spark ml pipeline en fitted pipeline ####
 
 ml_save(
@@ -209,11 +212,6 @@ ml_save(
   overwrite = TRUE
 )
 
-ml_save(
-  fitted_pipeline,
-  "flights_model",
-  overwrite = TRUE
-)
 
 
 ### use fitted pipeline to apply on test set
