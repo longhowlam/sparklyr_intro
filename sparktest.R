@@ -144,6 +144,10 @@ cars %>%
 ## Now you can use Spark MLlib ML pipelines on Spark data within RStudio
 spark_flights = sdf_copy_to(sc, flights)
 
+## 336776 records
+spark_flights %>% count()
+
+
 flight_dplyr_stmts = spark_flights %>%
   filter(!is.na(dep_delay)) %>%
   mutate(
@@ -160,13 +164,13 @@ flights_pipeline = ml_pipeline(sc) %>%
     tbl = flight_dplyr_stmts
   ) %>%
   ft_binarizer(
-    input.col = "dep_delay",
-    output.col = "delayed",
+    input_col = "dep_delay",
+    output_col = "delayed",
     threshold = 15
   ) %>%
   ft_bucketizer(
-    input.col = "sched_dep_time",
-    output.col = "hours",
+    input_col = "sched_dep_time",
+    output_col = "hours",
     splits = c(400, 800, 1200, 1600, 2000, 2400)
   )  %>%
   ft_r_formula(
@@ -174,6 +178,9 @@ flights_pipeline = ml_pipeline(sc) %>%
   ) %>% 
   ml_logistic_regression()
 
+## let's see what's in the pipeline
+flights_pipeline
+class(flights_pipeline)
 
 
 ### use train data to fit the ml pipeline
