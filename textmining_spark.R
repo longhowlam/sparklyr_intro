@@ -149,3 +149,56 @@ p = testpred %>%
 
 p
 
+#### finetuning ------------------------------------------------------------------------------------------------------------------
+
+grid <- list(
+  logistic_regression = list(
+    reg_param = (0:10)/10
+  )
+)
+
+cv <- ml_train_validation_split(
+  sc, 
+  estimator = review_model_pipeline, 
+  estimator_param_maps = grid,
+  evaluator = ml_binary_classification_evaluator(sc),
+  parallelism = 4
+)
+
+# Train the models, a total of 25 models are created, takes some time ~ 10 minutes
+cv_LR_model <- ml_fit(cv,  imdb_tbl)
+
+# Print the metrics
+ml_validation_metrics(cv_LR_model)
+
+#      areaUnderROC reg_param_1
+# 1     0.9163402         0.0
+# 2     0.9384569         0.1
+# 3     0.9391638         0.2
+# 4     0.9394623         0.3
+# 5     0.9395990         0.4
+# 6     0.9396445         0.5
+# 7     0.9396235         0.6
+# 8     0.9395668         0.7
+# 9     0.9395079         0.8
+# 10    0.9394368         0.9
+# 11    0.9393473         1.0
+
+#### apply the best model on test set
+predictions <- ml_transform(
+  cv_LR_model$best_model,
+  imdb_test_tbl
+)
+
+ml_binary_classification_evaluator(
+  predictions
+)
+## 0.9224777
+
+
+cv_LR_model$best_model
+
+
+# DISCONNECT SPARK --------------------------------------------------------------------------------
+
+sparklyr::spark_disconnect(sc)
