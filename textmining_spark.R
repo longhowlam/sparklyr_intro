@@ -10,6 +10,7 @@ library(DBI)
 library(stringr)
 library(readr)
 library(ggplot2)
+library(bench)
 
 sc <- spark_connect(master = "local", version = "2.4.0")
 
@@ -107,10 +108,15 @@ review_model_pipeline
 
 
 ### train the pipeline
-fitted_review_model_pipeline <- ml_fit(
-  review_model_pipeline,
-  imdb_tbl
+bm = bench::mark(max_iterations = 3,
+  T1 = {
+    fitted_review_model_pipeline <<- ml_fit(
+      review_model_pipeline,
+      imdb_tbl
+    )
+  }
 )
+
 
 
 ##### test model on test set --------------------------------------------------------------------------------------
