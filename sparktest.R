@@ -4,9 +4,11 @@ library(DBI)
 library(ggplot2)
 library(nycflights13)
 
-#spark_install(version = "2.4.0")
+spark_available_versions()
 
-sc <- spark_connect(master = "local", version = "2.4.0")
+spark_install(version = "3.0.0")
+
+sc <- spark_connect(master = "local", version = "3.0.0")
 
 cars = readRDS("cars.RDs")
 cars2 = readRDS("cars2.RDs")
